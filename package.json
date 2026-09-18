@@ -1,0 +1,97 @@
+{
+  "name": "@natsuneko-laboratory/react-native-desktop-window-size",
+  "version": "0.1.0",
+  "description": "Control the size and state of the window containing a React Native macOS or Windows view.",
+  "license": "MIT",
+  "author": "Natsuneko",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mika-f/react-native-desktop-window-size.git"
+  },
+  "homepage": "https://github.com/mika-f/react-native-desktop-window-size#readme",
+  "bugs": "https://github.com/mika-f/react-native-desktop-window-size/issues",
+  "keywords": [
+    "react-native",
+    "macos",
+    "windows",
+    "window",
+    "turbo-module"
+  ],
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "react-native": "./src/index.ts",
+  "files": [
+    "lib",
+    "src",
+    "macos",
+    "windows",
+    "*.podspec",
+    "react-native.config.js",
+    "!windows/**/x64",
+    "!windows/**/ARM64",
+    "!windows/**/Debug",
+    "!windows/**/Release",
+    "!windows/**/Generated Files",
+    "!windows/**/obj",
+    "!windows/**/bin",
+    "NuGet.config"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:native:macos": "bash scripts/test-macos.sh",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "codegen:windows": "node scripts/codegen-windows.cjs",
+    "check": "pnpm format:check && pnpm typecheck && pnpm test && pnpm build && pnpm codegen:windows",
+    "prepack": "pnpm build && pnpm codegen:windows"
+  },
+  "packageManager": "pnpm@10.34.5",
+  "engines": {
+    "node": ">=22.14.0"
+  },
+  "peerDependencies": {
+    "react": ">=19.1.0 <20",
+    "react-native": ">=0.81.0 <0.82.0",
+    "react-native-macos": ">=0.81.0 <0.82.0",
+    "react-native-windows": ">=0.81.0 <0.82.0"
+  },
+  "peerDependenciesMeta": {
+    "react-native-macos": {
+      "optional": true
+    },
+    "react-native-windows": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@react-native-windows/codegen": "0.81.0",
+    "@types/react": "^19.1.0",
+    "prettier": "^3.6.2",
+    "react": "19.1.4",
+    "react-native": "0.81.6",
+    "react-native-macos": "0.81.9",
+    "react-native-windows": "0.81.35",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  },
+  "codegenConfig": {
+    "name": "RNDesktopWindowSizeSpec",
+    "type": "modules",
+    "jsSrcsDir": "src",
+    "ios": {
+      "modulesProvider": {
+        "DesktopWindowSize": "RNDesktopWindowSize"
+      }
+    },
+    "windows": {
+      "namespace": "DesktopWindowSizeCodegen",
+      "outputDirectory": "windows/DesktopWindowSize/codegen",
+      "separateDataTypes": true
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -1,0 +1,18 @@
+node_modules/
+lib/
+coverage/
+*.tgz
+.DS_Store
+.native-build/
+Pods/
+build/
+windows/**/Generated Files/
+windows/**/x64/
+windows/**/ARM64/
+windows/**/Debug/
+windows/**/Release/
+windows/**/obj/
+windows/**/bin/
+windows/**/.vs/
+windows/**/packages/
+*.vcxproj.user

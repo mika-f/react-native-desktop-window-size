@@ -1,0 +1,18 @@
+root = ENV.fetch('RNDWS_ROOT')
+require File.join(root, 'node_modules/react-native-macos/scripts/react_native_pods')
+
+platform :osx, '14.0'
+project 'NativeBuild.xcodeproj'
+
+target 'NativeBuild' do
+  use_react_native!(
+    :path => '../../node_modules/react-native-macos',
+    :app_path => root,
+    :hermes_enabled => false
+  )
+  pod 'react-native-desktop-window-size', :path => root
+
+  post_install do |installer|
+    react_native_post_install(installer, '../../node_modules/react-native-macos', :mac_catalyst_enabled => false)
+  end
+end

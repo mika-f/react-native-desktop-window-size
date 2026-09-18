@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  javascript:
+    name: TypeScript, tests, and package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm check
+      - run: node scripts/check-autolinking.cjs
+      - name: Verify committed Windows codegen
+        run: git diff --exit-code -- windows/DesktopWindowSize/codegen
+      - run: pnpm pack --pack-destination .native-build
+      - run: node scripts/check-package.cjs
+
+  macos:
+    name: macOS native (${{ matrix.architecture }})
+    runs-on: macos-15
+    strategy:
+      fail-fast: false
+      matrix:
+        architecture: [paper, fabric]
+    env:
+      RCT_NEW_ARCH_ENABLED: ${{ matrix.architecture == 'fabric' && '1' || '0' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+      - run: gem install cocoapods -v 1.16.2 --no-document
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test:native:macos
+      - name: Build native module against React Native macOS
+        run: bash scripts/build-macos.sh
+
+  windows:
+    name: Windows native (Fabric, x64)
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - uses: microsoft/setup-msbuild@v2
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm codegen:windows
+      - run: node scripts/check-autolinking.cjs
+      - name: Build native module against React Native Windows
+        run: msbuild windows/DesktopWindowSize.sln /restore /m /p:Configuration=Release /p:Platform=x64 /p:RunCodegenWindows=false
+      - name: Test Win32 window operations
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force .native-build | Out-Null
+          cl /nologo /std:c++20 /EHsc /DRNDWS_STANDALONE_TEST /Iwindows/DesktopWindowSize tests/native/windows.cpp windows/DesktopWindowSize/WindowOperations.cpp /Fo.native-build/ /Fe.native-build/windows-tests.exe /link user32.lib comctl32.lib
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & .native-build/windows-tests.exe
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

@@ -1,0 +1,10 @@
+pnpm-lock.yaml
+lib/
+node_modules/
+.native-build/
+windows/**/codegen/
+windows/**/*.sln
+windows/**/*.vcxproj*
+windows/**/*.props
+windows/**/*.idl
+windows/**/*.rc
