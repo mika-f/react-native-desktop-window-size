@@ -1,6 +1,5 @@
-#ifndef RNDWS_STANDALONE_TEST
 #include "pch.h"
-#endif
+
 #include "WindowOperations.h"
 #include <commctrl.h>
 #include <algorithm>
