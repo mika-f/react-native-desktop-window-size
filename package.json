@@ -1,6 +1,6 @@
 {
   "name": "@natsuneko-laboratory/react-native-desktop-window-size",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Control the size and state of the window containing a React Native macOS or Windows view.",
   "license": "MIT",
   "author": "Natsuneko",
